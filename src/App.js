@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import TableData from "./components/TableData";
-import { Button, Form, Navbar, Container } from "react-bootstrap";
+import { Button, Form, Navbar, Container, Spinner } from "react-bootstrap";
 import moment from "moment";
 import axios from "axios";
 
@@ -11,9 +11,11 @@ function App() {
   const [selected, setSelected] = useState("");
   const [dateStart, setDateStart] = useState(moment().format("YYYY-MM-DD"));
   const [dateEnd, setDateEnd] = useState(moment().format("YYYY-MM-DD"));
+  const [loading, setLoading] = useState(true);
 
   const getData = async (params) => {
     try {
+      setLoading(true);
       const resData = await axios.get(
         "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false",
         { params: params }
@@ -23,9 +25,11 @@ function App() {
         "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false"
       );
       setClient(resClient.data);
+      setLoading(false);
       //console.log(res.data);
     } catch (error) {
       //console.error(error);
+      setLoading(true);
     }
   };
   useEffect(() => {
@@ -398,8 +402,22 @@ function App() {
                 Buscar
               </Button>{" "}
             </div>
+
+            <div className="col-12">
+              <hr></hr>
+              {loading ? (
+                <div className="text-center">
+                  <Spinner
+                    animation="border"
+                    role="status"
+                    style={{ width: "5rem", height: "5em", marginTop: "15rem" }}
+                  ></Spinner>
+                </div>
+              ) : (
+                <TableData data={data} />
+              )}
+            </div>
           </div>
-          <TableData data={data} />
         </div>
       </div>
     </div>
